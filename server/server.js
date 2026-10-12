@@ -32,15 +32,25 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
         const { nomeUsuario, emailUsuario, senhaUsuario, notificacaoUsuario, fotoUsuario } = req.body;
 
         // verifica se o email já existe ou não (tratando email em minúsculo)
-        const emailFormatado = emailUsuario.toLowerCase();
+        const emailFormatado = emailUsuario.trim().toLowerCase(); // Adicionei o TRIM para remover os espaços em branco (no começo e no final)
         const usuarioExiste = await Usuario.findOne({ emailUsuario: emailFormatado });
         if (usuarioExiste) {
             return res.status(400).json({ erro: 'E-mail já cadastrado.' });
         }
 
+        //REGEX para validar a senha (obriga ter pelo menos 8 caracteres, uma maiúscula, uma minúscula, um número e um caractere especial)
+        const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!regexsenha.test(senhaUsuario))
+        {
+            return res.status(400).json({
+                erro: 'Senha inválida. A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.'
+            });
+        }
+
         // criptografando a senha
         const salt = await bcrypt.genSalt(10);
-        const senhaCriptografada = await bcrypt.hash(senhaUsuario, salt);
+        const senhaCriptografada = await bcrypt.hash(senhaUsuario, salt);   
 
         const novoUsuario = new Usuario({
             nomeUsuario,
@@ -89,7 +99,7 @@ app.post('/api/usuarios/login', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Servidor rodando neste budega');
+    res.send('Servidor rodando nesta budega');
 });
 
 
