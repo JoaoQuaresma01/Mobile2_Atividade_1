@@ -5,6 +5,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const Usuario = require('./models/Usuario');
+const Conteudo = require('./models/Conteudo.js');
 
 const app = express();
 app.use(express.json());
@@ -102,6 +103,78 @@ app.get('/', (req, res) => {
     res.send('Servidor rodando nesta budega');
 });
 
+// 
+// Rotas para cadastar e listar o conteúdo
+//
+
+app.post('/api/conteudo/cadastrar', async (req, res) => {
+    try {
+        const {tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo} = req.body;
+
+        const novoConteudo = new Conteudo ({
+            tituloConteudo,
+            subtituloConteudo,
+            urlImagemConteudo,
+            descricaoConteudo,
+            categoriaConteudo,
+            dataCriacaoConteudo: Date.now()
+        });
+        
+        await novoConteudo.save();    
+        res.status(201).json({mensagem: 'Conteúdo foi cadastrado com su su sucesso'})
+    }catch(error){
+        res.status(500).json({erro: 'Erro ao cadastrar conteúdo', detalhe: error.message})
+    }
+});
+
+app.put('/api/conteudo/:id', async (req, res) => {
+    try {
+        const {tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo} = req.body;
+        const novoConteudo = await Conteudo.findByIdAndUpdate(req.params.id, req.body, {new: true});
+        if (!novoConteudo){
+            return res.status(404).json({erro: 'Conteúdo não encontrado'})        
+        }
+        await novoConteudo.save();    
+        res.status(201).json({mensagem: 'Conteúdo foi atualizado com su su sucesso'})
+    }catch(error){
+        res.status(500).json({erro: 'Erro ao atualizar o conteúdo', detalhe: error.message})
+    }
+})
+
+app.get('/api/conteudo/listar', async (req, res) =>{
+    try {
+        const listaConteudo = await Conteudo.find();
+        res.status(200).json(listaConteudo);
+    } catch (error) {
+        res.status(500).json({erro: 'Erro ao listar o conteúdo', detalhe: error.message})
+    }
+})
+
+app.get('/api/conteudo/:id', async (req, res) => {
+    try {
+        const conteudoId = req.params.id;
+        const conteudo = await Conteudo.findById(conteudoId);
+        if (!conteudo){
+            return res.status(404).json({erro: 'Conteúdo não encontrado'})        
+        }
+        res.status(200).json(conteudo)
+    }catch(error){
+        res.status(500).json({erro: 'Erro ao buscar conteúdo', detalhe: error.message})
+    }
+})
+
+app.delete('/api/conteudo/:id', async (req, res) => {
+    try{
+        const novoConteudo = await Conteudo.findByIdAndDelete(req.params.id);
+        if (!novoConteudo){
+            return res.status(404).json({erro: "Conteúdo não encontrado."})
+        }
+        res.status(201).json({mensagem: "Conteúdo deletado com su su sucesso!"});
+
+    }catch(error){
+        res.status(500).json({erro: "Erro ao deletar conteúdo", detalhe: error.message})
+    }
+})
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
