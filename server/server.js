@@ -12,6 +12,10 @@ app.use(cors());
 
 // link de conexão com o mongoDB
 const MONGO_URI = process.env.MONGO_URI;
+// Configuração DNS alternativa para resolveu o problema de conexão com o banco de dados
+const dns = require('dns');
+dns.setServers(['8.8.8.8']);
+
 
 if (!MONGO_URI) {
     console.error('Erro: A variável MONGO_URI não está definida no arquivo .env');
@@ -19,8 +23,8 @@ if (!MONGO_URI) {
 }
 
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('Conectado ao monguinho com su su sucesso!! c: '))
-  .catch((err) => console.error('Erro ao conectar com o monguinho :c :c', err));
+    .then(() => console.log('Conectado ao monguinho com su su sucesso!! c: '))
+    .catch((err) => console.error('Erro ao conectar com o monguinho :c :c', err));
 
 // rota de cadastro de usuário
 app.post('/api/usuarios/cadastro', async (req, res) => {
@@ -71,8 +75,8 @@ app.post('/api/usuarios/login', async (req, res) => {
             return res.status(401).json({ erro: 'Senha incorreta.' });
         }
 
-        res.status(200).json({ 
-            mensagem: 'Login realizado com sucesso!', 
+        res.status(200).json({
+            mensagem: 'Login realizado com sucesso!',
             usuario: {
                 nome: usuario.nomeUsuario,
                 email: usuario.emailUsuario,
@@ -83,6 +87,11 @@ app.post('/api/usuarios/login', async (req, res) => {
         res.status(500).json({ erro: 'Erro no servidor ao realizar login.', detalhes: error.message });
     }
 });
+
+app.get('/', (req, res) => {
+    res.send('Servidor rodando neste budega');
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
