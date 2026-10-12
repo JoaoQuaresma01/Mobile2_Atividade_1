@@ -150,6 +150,27 @@ app.get('/api/conteudo/listar', async (req, res) =>{
     }
 })
 
+//
+// Rota para buscas (Barra de pesquisa e filtro)
+//
+app.get('/api/conteudo/buscar', async (req, res) => {
+    try {
+        const {termo, categoria} = req.query;
+        const filtro = {};
+        if (termo) {
+            filtro.$or = [{tituloConteudo: {$regex: termo, $options: 'i'}}, {descricaoConteudo: {$regex: termo, $options: 'i'}}];
+        }
+        if (categoria){
+            filtro.categoriaConteudo = {$regex: categoria, $options: 'i'};
+        }
+        const resultados = await Conteudo.find(filtro);
+        res.status(200).json(resultados);   
+    }catch (error) {
+        res.status(500).json({erro: 'Erro na busca de conteúdo', detalhe: error.message});
+    }
+});
+
+
 app.get('/api/conteudo/:id', async (req, res) => {
     try {
         const conteudoId = req.params.id;
