@@ -35,8 +35,8 @@ const Login = ({ navigation }) => {
             });
 
             // João, o backend devolve os dados em response.data.usuario
-            // Aqui eu gravo isso no contexto. Assim você consegue usar os dados dele 
-            // no Menu Lateral e para bloquear os botões de edição das imagens depois!
+            // Aqui eu gravo isso no contexto, assim você consegue usar os dados dele 
+            // no Menu Lateral e para bloquear os botões de edição das imagens depois
             signIn(response.data.usuario);
 
             Alert.alert('Bem-vindo!', response.data.mensagem || 'Login realizado com sucesso');
