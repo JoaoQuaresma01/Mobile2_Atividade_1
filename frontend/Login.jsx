@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react'; // Hook para usar nossa memória global
 import { View, Alert } from 'react-native';
 import {
     Appbar,
@@ -8,9 +8,10 @@ import {
 } from 'react-native-paper';
 
 import { styles } from './css/Styles';
-
-// importando a configuração do Axios
 import api from './services/api';
+
+// precisamos importar o contexto que criei para salvar o usuário após o login
+import { AuthContext } from './contexts/AuthContext';
 
 const Login = ({ navigation }) => {
 
@@ -18,34 +19,34 @@ const Login = ({ navigation }) => {
     const [senha, setSenha] = React.useState('');
     const [mostrarSenha, setMostrarSenha] = React.useState(false);
 
-    // função assíncrona para comunicação com o back-end
+    // puxando a função signIn de dentro do nosso cofre (AuthContext)
+    const { signIn } = useContext(AuthContext);
+
     const entrar = async () => {
-        // validação básica
         if (!email || !senha) {
             Alert.alert('Atenção', 'Por favor, preencha o e-mail e a senha.');
             return;
         }
 
         try {
-            // a rota POST que valida o login
             const response = await api.post('/usuarios/login', {
                 emailUsuario: email,
                 senhaUsuario: senha
             });
 
-            // Se der tudo certo, mostra status 200 (OK), mostra a mensagem de sucesso
-            Alert.alert('Bem-vindo! c:', response.data.mensagem || 'Login realizado com sucesso!');
-            
-            // aqui vamos capturar o response.data.usuario 
-            // e salvar no aplicativo para o João usar no Menu!
+            // João, o backend devolve os dados em response.data.usuario
+            // Aqui eu gravo isso no contexto. Assim você consegue usar os dados dele 
+            // no Menu Lateral e para bloquear os botões de edição das imagens depois!
+            signIn(response.data.usuario);
 
-            // limpa os campos e navega para a área logada
+            Alert.alert('Bem-vindo!', response.data.mensagem || 'Login realizado com sucesso');
+            
+            // Limpa os dados por segurança antes de trocar de tela
             setEmail('');
             setSenha('');
             navigation.navigate('Perfil');
 
         } catch (error) {
-            // seee o backend barrar (senha incorreta ou e-mail não existe)
             const mensagemErro = error.response?.data?.erro || error.response?.data?.mensagem || 'E-mail ou senha incorretos.';
             Alert.alert('Erro no Login', mensagemErro);
             console.error('Erro no login:', error);

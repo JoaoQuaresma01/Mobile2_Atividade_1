@@ -9,26 +9,19 @@ import { createDrawerNavigator, DrawerContentScrollView } from '@react-navigatio
 
 import { PaperProvider } from 'react-native-paper';
 import { theme } from './theme/theme';
+import { AuthProvider } from './contexts/AuthContext';
 
-// AppBar
 import AppBar from './AppBar';
-// Rotas
 import Pesquisa from './Pesquisa';
-// Acesso
 import Acesso from './Acesso';
-// Login 
 import Login from './Login';
-// Cadastro
 import Cadastro from './Cadastro';
-// Perfil
 import { Perfil } from './Perfil';
-// Cabeçalho do menu
 import { CabecalhoMenu } from './CabecaMenu';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-// 1. CORRIGIDO AQUI PARA S MAIÚSCULO
 function StackNavigator() {
   return (
     <Stack.Navigator
@@ -59,7 +52,7 @@ function DrawerNavigation() {
         </View>
       )}
     >
-      {/* 2. CORRIGIDO AQUI PARA S MAIÚSCULO TAMBÉM */}
+
       <Drawer.Screen
         name="Início"
         component={StackNavigator}
@@ -84,10 +77,12 @@ export default function App() {
   }
 
   return (
-    <PaperProvider theme={theme}>
-      <NavigationContainer>
-        <DrawerNavigation />
-      </NavigationContainer>
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
+          <DrawerNavigation />
+        </NavigationContainer>
+      </PaperProvider>
+    </AuthProvider>
   );
 }

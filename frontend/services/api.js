@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// Usando o IP
+// agora o Axios busca a URL do arquivo .env
+// se a variável não for encontrada, ele usa o localhost como fallback de segurança.
 const api = axios.create({
-  baseURL: 'http://192.168.1.73:3000/api',
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api',
   timeout: 5000,
 });
 
