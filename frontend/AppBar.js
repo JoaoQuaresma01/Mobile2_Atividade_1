@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
 import { Appbar, ActivityIndicator } from 'react-native-paper';
 import { styles } from './css/Styles';
 import ModCard from './Cards';
 import api from './services/api'; // seu axios configurado
+import { useFocusEffect } from '@react-navigation/native';
 
 const AppBar = ({ navigation }) => {
     const [listaConteudos, setListaConteudos] = useState([]);
@@ -23,9 +24,17 @@ const AppBar = ({ navigation }) => {
     };
 
     // Executa ao abrir a tela
-    useEffect(() => {
-        carregarConteudos();
-    }, []);
+    // useEffect(() => {
+    //     carregarConteudos();
+    // }, []);
+
+    // Trocado por este useFocusEffect: Para ao editar o card ele atualizar automaticamente
+    useFocusEffect(
+        useCallback(() => {
+            carregarConteudos();
+        }, [])
+    );
+
 
     // 2. Função de Excluir com confirmação
     const handleExcluir = (id) => {
@@ -82,7 +91,7 @@ const AppBar = ({ navigation }) => {
                             key={item._id} 
                             conteudo={item} 
                             onExcluir={handleExcluir}
-                            onEditar={(item) => console.log('Navegar para editar', item)}
+                            onEditar={(item) => navigation.navigate('EditarConteudo', { conteudo: item })}
                         />
                     ))
                 )}

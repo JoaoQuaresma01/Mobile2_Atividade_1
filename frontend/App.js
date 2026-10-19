@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import SplashScreen from './SplashScreen';
 import { View } from 'react-native';
+import EditarConteudo from './EditarConteudo';
+import { useFocusEffect } from '@react-navigation/native';
 
 // React Navigation
 import { NavigationContainer } from '@react-navigation/native';
@@ -35,6 +37,7 @@ function StackNavigator() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Cadastro" component={Cadastro} />
       <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="EditarConteudo" component={EditarConteudo} />
     </Stack.Navigator>
   );
 }
