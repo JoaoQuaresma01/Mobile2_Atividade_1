@@ -1,54 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Avatar, Text, TextInput, Button, Divider, IconButton, } from 'react-native-paper';
-
-//campo  de imagem
+import { Avatar, Text, TextInput, Button, Divider, IconButton } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
+
+// João, importando nossa memória global para puxar quem logou
+import { AuthContext } from './contexts/AuthContext';
+import { perfilStyles as styles } from './css/Styles';
 
 const Perfil = ({ navigation }) => {
 
-    // Dados do usuário -> receber os dados  via banco de dados
-    const [nome, setNome] = useState('Emerson');
-    const [email, setEmail] = useState('emerson@email.com');
-    const [telefone, setTelefone] = useState('(15) 99999-9999');
-    const [cpf, setCpf] = useState('000.000.000-00');
+    // Puxando o 'usuario' que salvamos no contexto lá na tela de Login
+    const { usuario } = useContext(AuthContext);
+
+    // Dados do usuário -> Agora puxa os dados reais do MongoDB via AuthContext
+    // Se por algum motivo o contexto estiver vazio, ele deixa em branco para não quebrar a tela
+    const [nome, setNome] = useState(usuario?.nome || usuario?.nomeUsuario || '');
+    const [email, setEmail] = useState(usuario?.email || usuario?.emailUsuario || '');
+    
+    // João, nosso Schema do Mongo ainda não tem Telefone e CPF, então deixei vazio por padrão.
+    // Se formos usar, precisaremos adicionar no backend depois.
+    const [telefone, setTelefone] = useState('');
+    const [cpf, setCpf] = useState('');
     const [senha, setSenha] = useState('');
 
-    // Imagem do usuário
-    const [imagem, setImagem] = useState(null);
+    // Imagem do usuário (também tenta puxar do banco se houver)
+    const [imagem, setImagem] = useState(usuario?.foto || usuario?.fotoUsuario || null);
 
-    // ==============================
-    // ESCOLHER IMAGEM
-    // ==============================
-
+// Escolhe a imagem
     const editarFoto = async () => {
-        // Solicita permissão para acessar a galeria
         const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (!permissao.granted) {
             alert('Precisamos de permissão para acessar suas fotos.');
             return;
         }
-        // Abre a galeria
+
         const resultado = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
+            mediaTypes: ['images'], // Na versão mais nova do Expo o padrão mudou um pouco, deixei garantido
             allowsEditing: true,
             aspect: [1, 1],
             quality: 0.8,
         });
 
-        // Verifica se o usuário escolheu uma imagem
         if (!resultado.canceled) {
             setImagem(resultado.assets[0].uri);
         }
-
     };
 
-    // ==============================
-    // SALVAR PERFIL
-    // ==============================
-
+// SALVA PERFIL
     const salvarPerfil = () => {
+        // João, no futuro vamos precisar de uma rota PUT no backend para atualizar isso no MongoDB
         console.log('Dados do perfil:', {
             nome,
             email,
@@ -56,13 +57,10 @@ const Perfil = ({ navigation }) => {
             cpf,
             senha,
             imagem,
-
         });
 
-         alert('Perfil atualizado com sucesso!');
-
+        alert('Perfil atualizado com sucesso!');
     };
-
 
     return (
         <ScrollView style={styles.container}>
@@ -70,20 +68,19 @@ const Perfil = ({ navigation }) => {
             <View style={styles.cabecalho}>
                 {/* AVATAR */}
                 <View style={styles.avatarContainer}>
-                    { imagem ?( 
-                          // Mostra a imagem escolhida
+                    {imagem ? (
                         <Image
                             source={{ uri: imagem }}
                             style={styles.avatarImagem}
-                        />) : (
-                        // Avatar padrão
+                        />
+                    ) : (
                         <Avatar.Icon
                             size={100}
                             icon="account"
                             style={styles.avatar}
                         />
-
                     )}
+                    
                     {/* BOTÃO EDITAR */}
                     <IconButton
                         icon="pencil"
@@ -92,52 +89,39 @@ const Perfil = ({ navigation }) => {
                         style={styles.botaoEditar}
                         onPress={editarFoto}
                     />
-
                 </View>
 
-
-                {/* TÍTULO */}
-
+                {/* TÍTULO - AGORA DINÂMICO! */}
                 <Text
                     variant="headlineSmall"
                     style={styles.titulo}
                 >
-                    Meu Perfil
+                    Olá, {nome || 'Visitante'}!
                 </Text>
-
 
                 <Text style={styles.subtitulo}>
                     Atualize seus dados pessoais
                 </Text>
-
             </View>
 
-
             <Divider />
-
 
             {/* ============================= */}
             {/* FORMULÁRIO */}
             {/* ============================= */}
-
             <View style={styles.formulario}>
 
                 {/* NOME */}
-
                 <TextInput
                     label="Nome"
                     value={nome}
                     onChangeText={setNome}
                     mode="outlined"
-                    left={
-                        <TextInput.Icon icon="account" />
-                    }
+                    left={<TextInput.Icon icon="account" />}
                     style={styles.input}
                 />
 
-
                 {/* E-MAIL */}
-
                 <TextInput
                     label="E-mail"
                     value={email}
@@ -145,62 +129,46 @@ const Perfil = ({ navigation }) => {
                     mode="outlined"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    left={
-                        <TextInput.Icon icon="email" />
-                    }
+                    left={<TextInput.Icon icon="email" />}
                     style={styles.input}
                 />
 
-
                 {/* TELEFONE */}
-
                 <TextInput
                     label="Telefone"
                     value={telefone}
                     onChangeText={setTelefone}
                     mode="outlined"
                     keyboardType="phone-pad"
-                    left={
-                        <TextInput.Icon icon="phone" />
-                    }
+                    left={<TextInput.Icon icon="phone" />}
                     style={styles.input}
                 />
 
-
                 {/* CPF */}
-
                 <TextInput
                     label="CPF"
                     value={cpf}
                     onChangeText={setCpf}
                     mode="outlined"
                     keyboardType="numeric"
-                    left={
-                        <TextInput.Icon icon="card-account-details" />
-                    }
+                    left={<TextInput.Icon icon="card-account-details" />}
                     style={styles.input}
                 />
 
-
                 {/* NOVA SENHA */}
-
                 <TextInput
                     label="Nova senha"
                     value={senha}
                     onChangeText={setSenha}
                     mode="outlined"
                     secureTextEntry
-                    left={
-                        <TextInput.Icon icon="lock" />
-                    }
+                    left={<TextInput.Icon icon="lock" />}
                     style={styles.input}
                 />
-
 
                 {/* ============================= */}
                 {/* SALVAR */}
                 {/* ============================= */}
-
                 <Button
                     mode="contained"
                     icon="content-save"
@@ -210,11 +178,9 @@ const Perfil = ({ navigation }) => {
                     Salvar alterações
                 </Button>
 
-
                 {/* ============================= */}
                 {/* VOLTAR */}
                 {/* ============================= */}
-
                 <Button
                     mode="outlined"
                     icon="arrow-left"
@@ -225,128 +191,8 @@ const Perfil = ({ navigation }) => {
                 </Button>
 
             </View>
-
         </ScrollView>
     );
 };
 
-
-const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        backgroundColor: '#F5F5F5',
-    },
-
-
-    // ==============================
-    // CABEÇALHO
-    // ==============================
-
-    cabecalho: {
-        alignItems: 'center',
-        paddingVertical: 30,
-        backgroundColor: '#C0C0C0',
-    },
-
-
-    // ==============================
-    // AVATAR
-    // ==============================
-
-    avatarContainer: {
-        position: 'relative',
-        marginBottom: 10,
-    },
-
-
-    avatar: {
-        backgroundColor: '#F2A900',
-    },
-
-
-    // Imagem escolhida
-    avatarImagem: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        borderWidth: 3,
-        borderColor: '#FFFFFF',
-    },
-
-
-    // ==============================
-    // BOTÃO EDITAR
-    // ==============================
-
-    botaoEditar: {
-        position: 'absolute',
-
-        right: -8,
-        bottom: -8,
-
-        backgroundColor: '#555555',
-
-        margin: 0,
-
-        borderWidth: 2,
-        borderColor: '#FFFFFF',
-    },
-
-
-    // ==============================
-    // TÍTULO
-    // ==============================
-
-    titulo: {
-        color: '#FFFFFF',
-        fontWeight: 'bold',
-    },
-
-
-    subtitulo: {
-        color: '#FFFFFF',
-        marginTop: 5,
-    },
-
-
-    // ==============================
-    // FORMULÁRIO
-    // ==============================
-
-    formulario: {
-        padding: 20,
-    },
-
-
-    input: {
-        marginBottom: 15,
-        backgroundColor: '#FFFFFF',
-    },
-
-
-    // ==============================
-    // BOTÃO SALVAR
-    // ==============================
-
-    botao: {
-        marginTop: 10,
-        paddingVertical: 5,
-        backgroundColor: '#F2A900',
-    },
-
-
-    // ==============================
-    // BOTÃO VOLTAR
-    // ==============================
-
-    botaoVoltar: {
-        marginTop: 15,
-        paddingVertical: 5,
-    },
-
-});
-
-
 export { Perfil };
-
