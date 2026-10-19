@@ -209,3 +209,53 @@ export const perfilStyles = StyleSheet.create({
         paddingVertical: 5,
     },
 });
+
+// ==========================================
+// ESTILOS DO MENU LATERAL (DRAWER)
+// ==========================================
+export const menuStyles = StyleSheet.create({
+    container: {
+        backgroundColor: '#C0C0C0',
+        paddingTop: 25,
+        paddingHorizontal: 20,
+        paddingBottom: 10,
+    },
+    usuario: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatar: {
+        backgroundColor: '#F2A900',
+    },
+    informacoes: {
+        flex: 1,
+        marginLeft: 15,
+    },
+    nome: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+        fontSize: 19,
+    },
+    email: {
+        color: '#FFFFFF',
+        marginTop: 3,
+    },
+    perfil: {
+        marginTop: 15,
+        paddingTop: 8,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.3)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    perfilTexto: {
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+    },
+    // Estilo para o botão de Login quando for visitante
+    botaoLoginVisitante: {
+        marginTop: 5,
+        alignSelf: 'flex-start',
+    }
+});
