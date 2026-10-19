@@ -3,28 +3,25 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { Avatar, Text, IconButton, Portal, Dialog, Button } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useContext} from 'react';
+// importando a lógica do AuthContext.js para usar os dados do usuário. (feature/frontend-menu-identificacao)
+import { AuthContext } from './contexts/AuthContext';
+import { menuStyles as styles } from './css/Styles';
 const CabecalhoMenu = () => {
 
-  // Por enquanto os dados estão fixos.
-  // Depois vamos buscar essas informações do usuário que fez login.
-  const usuario = {
-    nome: 'Emerson',
-    email: 'emerson@email.com',
-  };
+  
+// pegando informações do usuário. (feature/frontend-menu-identificacao)
+const { usuario, signOut } = useContext(AuthContext);
 
   const navigation = useNavigation();
   const [dialogSair, setDialogSair] = useState(false);
 
-  const confirmarSaida = () => {
-    setDialogSair(false);
-    //Coloque aqui sua lógica de logout
-    console.log("Usuário saiu");
-    // Exemplo:
-    navigation.navigate("Login");
-  };
-
-
-
+ // Função para sair do aplicativo (feature/frontend-menu-identificacao)
+const confirmarSaida = () => {
+  setDialogSair(false);
+  signOut(); // limpa o login
+  navigation.navigate("Home");
+};
   return (
 
     <View style={styles.container}>
@@ -37,25 +34,25 @@ const CabecalhoMenu = () => {
           icon="account"
           style={styles.avatar}
         />
-
-        {/* Nome e e-mail */}
-        <View style={styles.informacoes}>
-
-          <Text
-            variant="titleMedium"
-            style={styles.nome}
-          >
-            {usuario.nome}
+        
+        {/* Nome e e-mail  Mudança pra quando não tiver um usuário logado. (feature/frontend-menu-identificacao) */}
+         <View style={styles.informacoes}>
+          <Text variant="titleMedium" style={styles.nome}>
+            {usuario ? (usuario.nome || usuario.nomeUsuario) : 'Olá, Visitante!'}
           </Text>
-
-          <Text
-            variant="bodyMedium"
-            style={styles.email}
-            numberOfLines={1}
-          >
-            {usuario.email}
-          </Text>
-
+          {usuario ? (
+            <Text variant="bodyMedium" style={styles.email} numberOfLines={1}>
+              {usuario.email || usuario.emailUsuario}
+            </Text>
+          ) : (
+            <Text
+              variant="bodyMedium"
+              style={[styles.email, { fontWeight: 'bold', textDecorationLine: 'underline', marginTop: 4 }]}
+              onPress={() => navigation.navigate('Login')}
+            >
+              Toque aqui para fazer login
+            </Text>
+          )}
         </View>
 
       </View>
@@ -166,58 +163,5 @@ const CabecalhoMenu = () => {
     </View>
   )
 };
-
-
-const styles = StyleSheet.create({
-
-  container: {
-    backgroundColor: '#C0C0C0',
-    paddingTop: 25,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-
-  usuario: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  avatar: {
-    backgroundColor: '#F2A900',
-  },
-
-  informacoes: {
-    flex: 1,
-    marginLeft: 15,
-  },
-
-  nome: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 19,
-  },
-
-  email: {
-    color: '#FFFFFF',
-    marginTop: 3,
-  },
-
-  perfil: {
-    marginTop: 15,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.3)',
-
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  perfilTexto: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-
-});
 
 export { CabecalhoMenu };

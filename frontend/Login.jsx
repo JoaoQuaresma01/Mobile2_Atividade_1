@@ -44,7 +44,7 @@ const Login = ({ navigation }) => {
             // Limpa os dados por segurança antes de trocar de tela
             setEmail('');
             setSenha('');
-            navigation.navigate('Perfil');
+            navigation.navigate('Home'); // navigate para home quando o usuário logar (feature/frontend-menu-identificacao)
 
         } catch (error) {
             const mensagemErro = error.response?.data?.erro || error.response?.data?.mensagem || 'E-mail ou senha incorretos.';
