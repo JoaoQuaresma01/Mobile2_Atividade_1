@@ -103,19 +103,17 @@ const confirmarSaida = () => {
           onPress={() => navigation.navigate('Perfil')}
         />
       </View>
-      {/* Área do configuração */}
-      <View style={styles.perfil}  >
-
-        <Text
-          variant="bodyMedium"
-          style={styles.perfilTexto}>
+      
+      {/* Área de configuração */}
+      <View style={styles.perfil}>
+        <Text variant="bodyMedium" style={styles.perfilTexto}>
           Configuração
         </Text>
         <IconButton
           icon="cog"
           iconColor="white"
           size={24}
-          onPress={() => navigation.navigate('Perfil')}
+          onPress={() => navigation.navigate('Configuracoes')}
         />
       </View>
 

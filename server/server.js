@@ -197,6 +197,55 @@ app.delete('/api/conteudo/:id', async (req, res) => {
     }
 })
 
+//
+// Novas Rotas para a tela de configurações 
+//
+
+// ROTA: Excluir Conta do Usuário
+app.delete('/api/usuarios/excluir/:email', async (req, res) => {
+    try {
+        const emailFormatado = req.params.email.toLowerCase().trim();
+        const usuarioDeletado = await Usuario.findOneAndDelete({ emailUsuario: emailFormatado });
+        
+        if (!usuarioDeletado) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        res.status(200).json({ mensagem: 'Conta excluída com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao excluir conta.', detalhe: error.message });
+    }
+});
+// ROTA: Alterar Senha do Usuário
+app.put('/api/usuarios/alterar-senha', async (req, res) => {
+    try {
+        const { emailUsuario, senhaAtual, novaSenha } = req.body;
+        const emailFormatado = emailUsuario.toLowerCase().trim();
+        const usuario = await Usuario.findOne({ emailUsuario: emailFormatado });
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        // Valida se a senha atual está correta
+        const senhaCorreta = await bcrypt.compare(senhaAtual, usuario.senhaUsuario);
+        if (!senhaCorreta) {
+            return res.status(400).json({ erro: 'A senha atual está incorreta.' });
+        }
+        // Valida o formato da nova senha (8 caracteres, maiúscula, número, especial)
+        const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!regexsenha.test(novaSenha)) {
+            return res.status(400).json({
+                erro: 'Nova senha fraca. Deve conter 8 caracteres, maiúscula, minúscula, número e caractere especial.'
+            });
+        }
+        // Criptografa a nova senha e salva
+        const salt = await bcrypt.genSalt(10);
+        usuario.senhaUsuario = await bcrypt.hash(novaSenha, salt);
+        await usuario.save();
+        res.status(200).json({ mensagem: 'Senha alterada com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao alterar senha.', detalhe: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`PASSAMO FAMÍLIA`);

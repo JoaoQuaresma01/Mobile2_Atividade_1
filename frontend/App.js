@@ -18,6 +18,7 @@ import Login from './Login';
 import Cadastro from './Cadastro';
 import { Perfil } from './Perfil';
 import { CabecalhoMenu } from './CabecaMenu';
+import Configuracoes from './Configuracoes';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -34,7 +35,8 @@ function StackNavigator() {
       <Stack.Screen name="Acesso" component={Acesso} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Cadastro" component={Cadastro} />
-      <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="Perfil" component={Perfil} /> 
+      <Stack.Screen name="Configuracoes" component={Configuracoes} /> 
     </Stack.Navigator>
   );
 }
