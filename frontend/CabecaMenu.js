@@ -1,27 +1,27 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Avatar, Text, IconButton, Portal, Dialog, Button } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useContext} from 'react';
+import { useContext } from 'react';
 // importando a lógica do AuthContext.js para usar os dados do usuário. (feature/frontend-menu-identificacao)
 import { AuthContext } from './contexts/AuthContext';
 import { menuStyles as styles } from './css/Styles';
 const CabecalhoMenu = () => {
 
-  
-// pegando informações do usuário. (feature/frontend-menu-identificacao)
-const { usuario, signOut } = useContext(AuthContext);
+
+  // pegando informações do usuário. (feature/frontend-menu-identificacao)
+  const { usuario, signOut } = useContext(AuthContext);
 
   const navigation = useNavigation();
   const [dialogSair, setDialogSair] = useState(false);
 
- // Função para sair do aplicativo (feature/frontend-menu-identificacao)
-const confirmarSaida = () => {
-  setDialogSair(false);
-  signOut(); // limpa o login
-  navigation.navigate("Home");
-};
+  // Função para sair do aplicativo (feature/frontend-menu-identificacao)
+  const confirmarSaida = () => {
+    setDialogSair(false);
+    signOut(); // limpa o login
+    navigation.navigate("Home");
+  };
   return (
 
     <View style={styles.container}>
@@ -34,9 +34,9 @@ const confirmarSaida = () => {
           icon="account"
           style={styles.avatar}
         />
-        
+
         {/* Nome e e-mail  Mudança pra quando não tiver um usuário logado. (feature/frontend-menu-identificacao) */}
-         <View style={styles.informacoes}>
+        <View style={styles.informacoes}>
           <Text variant="titleMedium" style={styles.nome}>
             {usuario ? (usuario.nome || usuario.nomeUsuario) : 'Olá, Visitante!'}
           </Text>
@@ -59,19 +59,25 @@ const confirmarSaida = () => {
 
 
       {/* Área do perfil */}
-      <View style={styles.perfil}>
-        <Text
-          variant="bodyMedium"
-          style={styles.perfilTexto}>
+      <Pressable
+        style={styles.perfil}
+        onPress={() => {
+          if (!usuario) {
+            navigation.navigate('Login');
+          } else {
+            navigation.navigate('Perfil');
+          }
+        }}
+      >
+        <Text variant="bodyMedium" style={styles.perfilTexto}>
           Meu perfil
         </Text>
         <IconButton
           icon="account"
           iconColor="white"
           size={24}
-          onPress={{}}
         />
-      </View>
+      </Pressable>
 
 
       {/* Área do Notificação */}

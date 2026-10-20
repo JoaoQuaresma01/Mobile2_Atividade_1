@@ -64,6 +64,9 @@ const AppBar = ({ navigation }) => {
     return (
         <>
             <Appbar.Header style={styles.header}>
+                {!usuario && (
+                    <Appbar.Action icon="account" onPress={() => navigation.navigate('Acesso')} />
+                )}
                 <Appbar.Action icon="menu" iconColor="white" onPress={() => navigation.openDrawer()} />
                 <Appbar.Content title="Technologic" style={styles.title} />
                 <Appbar.Action icon="magnify" onPress={() => navigation.navigate('Pesquisa')} />
