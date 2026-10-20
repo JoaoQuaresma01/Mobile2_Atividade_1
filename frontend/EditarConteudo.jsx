@@ -1,78 +1,119 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
-import { Appbar, TextInput, Button } from 'react-native-paper';
+import { View, ScrollView, Alert, StyleSheet } from 'react-native';
+import { Appbar, TextInput, Button, Text } from 'react-native-paper';
 import { styles } from './css/Styles';
 import api from './services/api';
 
 const EditarConteudo = ({ route, navigation }) => {
-    // 1. Recebe os dados do card enviados pelo AppBar
-    const { conteudo } = route.params;
+    const { conteudo } = route.params || {};
+    const isNovo = !conteudo?._id;
 
-    // 2. Estados preenchidos com os dados atuais do card
-    const [titulo, setTitulo] = useState(conteudo?.tituloConteudo || '');
+    const [titulo, setTitulo]       = useState(conteudo?.tituloConteudo    || '');
     const [subtitulo, setSubtitulo] = useState(conteudo?.subtituloConteudo || '');
     const [urlImagem, setUrlImagem] = useState(conteudo?.urlImagemConteudo || '');
     const [descricao, setDescricao] = useState(conteudo?.descricaoConteudo || '');
-    const [salvando, setSalvando] = useState(false);
+    const [categoria, setCategoria] = useState(conteudo?.categoriaConteudo || '');
+    const [salvando, setSalvando]   = useState(false);
 
-    // 3. Função para salvar as alterações no MongoDB (PUT)
-    const salvarEdicao = async () => {
-        if (!titulo) {
+    const salvar = async () => {
+        if (!titulo.trim()) {
             Alert.alert('Atenção', 'O título não pode ficar vazio.');
+            return;
+        }
+        if (!urlImagem.trim()) {
+            Alert.alert('Atenção', 'A URL da imagem é obrigatória.');
+            return;
+        }
+        if (!subtitulo.trim()) {
+            Alert.alert('Atenção', 'O subtítulo é obrigatório.');
             return;
         }
 
         try {
             setSalvando(true);
-            // Chama a rota PUT do backend que você já tem no server.js
-            await api.put(`/conteudo/${conteudo._id}`, {
-                tituloConteudo: titulo,
-                subtituloConteudo: subtitulo,
-                urlImagemConteudo: urlImagem,
-                descricaoConteudo: descricao
-            });
 
-            Alert.alert('Sucesso!', 'Conteúdo atualizado com sucesso.', [
-                { text: 'OK', onPress: () => navigation.goBack() } // Volta para a Home
-            ]);
+            if (isNovo) {
+                // Cadastrar novo conteúdo
+                await api.post('/conteudo/cadastrar', {
+                    tituloConteudo:    titulo.trim(),
+                    subtituloConteudo: subtitulo.trim(),
+                    urlImagemConteudo: urlImagem.trim(),
+                    descricaoConteudo: descricao.trim(),
+                    categoriaConteudo: categoria.trim(),
+                });
+                Alert.alert('Sucesso!', 'Conteúdo cadastrado com sucesso!', [
+                    { text: 'OK', onPress: () => navigation.goBack() },
+                ]);
+            } else {
+                // Atualizar conteúdo existente
+                await api.put(`/conteudo/${conteudo._id}`, {
+                    tituloConteudo:    titulo.trim(),
+                    subtituloConteudo: subtitulo.trim(),
+                    urlImagemConteudo: urlImagem.trim(),
+                    descricaoConteudo: descricao.trim(),
+                    categoriaConteudo: categoria.trim(),
+                });
+                Alert.alert('Sucesso!', 'Conteúdo atualizado com sucesso!', [
+                    { text: 'OK', onPress: () => navigation.goBack() },
+                ]);
+            }
         } catch (error) {
-            console.error('Erro ao atualizar:', error);
-            Alert.alert('Erro', 'Não foi possível atualizar o conteúdo.');
+            console.error('Erro ao salvar:', error);
+            Alert.alert('Erro', 'Não foi possível salvar o conteúdo.');
         } finally {
             setSalvando(false);
         }
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+        <View style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
             <Appbar.Header style={styles.header}>
                 <Appbar.BackAction iconColor="white" onPress={() => navigation.goBack()} />
-                <Appbar.Content title="Editar Conteúdo" titleStyle={{ color: 'white' }} />
+                <Appbar.Content
+                    title={isNovo ? 'Novo Conteúdo' : 'Editar Conteúdo'}
+                    titleStyle={{ color: 'white', fontWeight: 'bold' }}
+                />
             </Appbar.Header>
 
-            <ScrollView contentContainerStyle={{ padding: 20 }}>
+            <ScrollView contentContainerStyle={editStyles.conteudo} showsVerticalScrollIndicator={false}>
+                <Text variant="bodySmall" style={editStyles.labelSecao}>Informações básicas</Text>
+
                 <TextInput
-                    label="Título"
+                    label="Título *"
                     value={titulo}
                     onChangeText={setTitulo}
                     mode="outlined"
-                    style={{ marginBottom: 15 }}
+                    left={<TextInput.Icon icon="format-title" />}
+                    style={editStyles.input}
                 />
 
                 <TextInput
-                    label="Subtítulo"
+                    label="Subtítulo / Episódio *"
                     value={subtitulo}
                     onChangeText={setSubtitulo}
                     mode="outlined"
-                    style={{ marginBottom: 15 }}
+                    left={<TextInput.Icon icon="subtitles-outline" />}
+                    style={editStyles.input}
                 />
 
                 <TextInput
-                    label="URL da Imagem"
+                    label="URL da Imagem de Capa *"
                     value={urlImagem}
                     onChangeText={setUrlImagem}
                     mode="outlined"
-                    style={{ marginBottom: 15 }}
+                    keyboardType="url"
+                    autoCapitalize="none"
+                    left={<TextInput.Icon icon="image-outline" />}
+                    style={editStyles.input}
+                />
+
+                <TextInput
+                    label="Categoria (ex: Série, Filme, Anime)"
+                    value={categoria}
+                    onChangeText={setCategoria}
+                    mode="outlined"
+                    left={<TextInput.Icon icon="tag-outline" />}
+                    style={editStyles.input}
                 />
 
                 <TextInput
@@ -82,22 +123,61 @@ const EditarConteudo = ({ route, navigation }) => {
                     mode="outlined"
                     multiline
                     numberOfLines={4}
-                    style={{ marginBottom: 25 }}
+                    left={<TextInput.Icon icon="text-long" />}
+                    style={[editStyles.input, { marginBottom: 28 }]}
                 />
 
                 <Button
                     mode="contained"
+                    icon={isNovo ? 'plus-circle' : 'content-save'}
                     loading={salvando}
                     disabled={salvando}
-                    buttonColor="#F2A900"
+                    buttonColor="#C0C0C0"
                     textColor="white"
-                    onPress={salvarEdicao}
+                    style={editStyles.botao}
+                    onPress={salvar}
                 >
-                    Salvar Alterações
+                    {salvando ? 'Salvando...' : isNovo ? 'Cadastrar' : 'Salvar Alterações'}
+                </Button>
+
+                <Button
+                    mode="outlined"
+                    icon="arrow-left"
+                    disabled={salvando}
+                    style={editStyles.botaoVoltar}
+                    onPress={() => navigation.goBack()}
+                >
+                    Cancelar
                 </Button>
             </ScrollView>
         </View>
     );
 };
+
+const editStyles = StyleSheet.create({
+    conteudo: {
+        padding: 20,
+        paddingBottom: 40,
+    },
+    labelSecao: {
+        color: '#888',
+        textTransform: 'uppercase',
+        letterSpacing: 0.8,
+        marginBottom: 12,
+        marginLeft: 2,
+    },
+    input: {
+        marginBottom: 14,
+        backgroundColor: '#FFFFFF',
+    },
+    botao: {
+        paddingVertical: 4,
+        borderRadius: 8,
+        marginBottom: 12,
+    },
+    botaoVoltar: {
+        borderRadius: 8,
+    },
+});
 
 export default EditarConteudo;

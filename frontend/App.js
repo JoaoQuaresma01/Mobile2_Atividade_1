@@ -19,6 +19,8 @@ import Acesso from './Acesso';
 import Login from './Login';
 import Cadastro from './Cadastro';
 import { Perfil } from './Perfil';
+import Configuracoes from './Configuracoes';
+import Notificacoes from './Notificacoes';
 import { CabecalhoMenu } from './CabecaMenu';
 
 const Stack = createNativeStackNavigator();
@@ -37,6 +39,8 @@ function StackNavigator() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Cadastro" component={Cadastro} />
       <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="Configuracoes" component={Configuracoes} />
+      <Stack.Screen name="Notificacoes" component={Notificacoes} />
       <Stack.Screen name="EditarConteudo" component={EditarConteudo} />
     </Stack.Navigator>
   );

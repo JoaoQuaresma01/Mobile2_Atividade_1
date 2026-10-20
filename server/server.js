@@ -90,7 +90,10 @@ app.post('/api/usuarios/login', async (req, res) => {
             usuario: {
                 nome: usuario.nomeUsuario,
                 email: usuario.emailUsuario,
-                foto: usuario.fotoUsuario
+                foto: usuario.fotoUsuario,
+                telefone: usuario.telefone || '',
+                cpf: usuario.cpf || '',
+                notificacao: usuario.notificacaoUsuario ?? true
             }
         });
     } catch (error) {
@@ -247,10 +250,15 @@ app.put('/api/usuarios/alterar-senha', async (req, res) => {
 
 app.put('/api/usuarios/perfil', async (req, res) => {
     try {
-        const { emailUsuario, nomeUsuario, fotoUsuario, novaSenha } = req.body;
+        const { emailUsuario, nomeUsuario, fotoUsuario, novaSenha, telefone, cpf, notificacaoUsuario } = req.body;
         const emailFormatado = emailUsuario.toLowerCase().trim();
 
-        const camposAtualizar = { nomeUsuario, fotoUsuario: fotoUsuario || '' };
+        const camposAtualizar = {};
+        if (typeof nomeUsuario !== 'undefined') camposAtualizar.nomeUsuario = nomeUsuario;
+        if (typeof fotoUsuario !== 'undefined') camposAtualizar.fotoUsuario = fotoUsuario;
+        if (typeof telefone !== 'undefined') camposAtualizar.telefone = telefone;
+        if (typeof cpf !== 'undefined') camposAtualizar.cpf = cpf;
+        if (typeof notificacaoUsuario !== 'undefined') camposAtualizar.notificacaoUsuario = Boolean(notificacaoUsuario);
 
         if (novaSenha && novaSenha.trim()) {
             const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -279,11 +287,57 @@ app.put('/api/usuarios/perfil', async (req, res) => {
             usuario: {
                 nome: usuarioAtualizado.nomeUsuario,
                 email: usuarioAtualizado.emailUsuario,
-                foto: usuarioAtualizado.fotoUsuario
+                foto: usuarioAtualizado.fotoUsuario,
+                telefone: usuarioAtualizado.telefone || '',
+                cpf: usuarioAtualizado.cpf || '',
+                notificacao: usuarioAtualizado.notificacaoUsuario ?? true
             }
         });
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao atualizar perfil.', detalhe: error.message });
+    }
+});
+
+// ROTA: Atualizar apenas Notificações
+app.put('/api/usuarios/notificacao', async (req, res) => {
+    try {
+        const { emailUsuario, notificacaoUsuario } = req.body;
+        const emailFormatado = emailUsuario.toLowerCase().trim();
+        const usuarioAtualizado = await Usuario.findOneAndUpdate(
+            { emailUsuario: emailFormatado },
+            { notificacaoUsuario: Boolean(notificacaoUsuario) },
+            { new: true }
+        );
+        if (!usuarioAtualizado) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        res.status(200).json({
+            mensagem: 'Preferência de notificação atualizada!',
+            notificacao: usuarioAtualizado.notificacaoUsuario
+        });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar notificação.', detalhe: error.message });
+    }
+});
+
+// ROTA: Buscar dados do usuário pelo email
+app.get('/api/usuarios/:email', async (req, res) => {
+    try {
+        const emailFormatado = req.params.email.toLowerCase().trim();
+        const usuario = await Usuario.findOne({ emailUsuario: emailFormatado });
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        res.status(200).json({
+            nome: usuario.nomeUsuario,
+            email: usuario.emailUsuario,
+            foto: usuario.fotoUsuario,
+            telefone: usuario.telefone || '',
+            cpf: usuario.cpf || '',
+            notificacao: usuario.notificacaoUsuario ?? true
+        });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao buscar dados do usuário.', detalhe: error.message });
     }
 });
 

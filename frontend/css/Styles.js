@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import Colors from '../theme/Colors';
 
 // ==========================================
 // ESTILOS GLOBAIS (LOGIN, CADASTRO, ETC)
@@ -13,22 +14,24 @@ export const styles = StyleSheet.create({
         width: 300,
         height: 300,
         marginBottom: 20,
-        backgroundColor: 'gray',
+        backgroundColor: Colors.surfaceAlt,
         borderRadius: 150,
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#0f0e0e',
+        color: Colors.textPrimary,
     },
     subtitle: {
         marginTop: 10,
         fontSize: 16,
-        color: '#0d0d0d',
+        color: Colors.textSecondary,
     },
+    // ── Cabeçalho (Appbar) ──────────────────────
     header: {
-        backgroundColor: '#C0C0C0',
+        backgroundColor: Colors.primary,
     },
+    // ── Abas (legado – mantido para compatibilidade) ─
     tabs: {
         height: 100,
         flexGrow: 0,
@@ -39,18 +42,18 @@ export const styles = StyleSheet.create({
         marginHorizontal: 2,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.surface,
         borderWidth: 1,
-        borderColor: '#C0C0C0',
+        borderColor: Colors.border,
         borderRadius: 5,
         marginTop: 10,
     },
     tabText: {
-        color: '#0b0b0b',
+        color: Colors.textPrimary,
         fontSize: 14,
         fontWeight: 'bold',
     },
-// ========= CARD  ================
+    // ── Cards ───────────────────────────────────
     cards: {
         flex: 1,
     },
@@ -64,142 +67,145 @@ export const styles = StyleSheet.create({
         marginTop: 0,
         marginBottom: 10,
         borderRadius: 10,
-        backgroundColor: '#FFFFFF',
-        elevation: 4,
+        backgroundColor: Colors.surface,
+        elevation: 3,
     },
     cardTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
+        color: Colors.textPrimary,
     },
     cardCover: {
-        height: 200,
+        // Mantido por compatibilidade; Cards.js usa aspectRatio
+        aspectRatio: 16 / 9,
+        backgroundColor: Colors.surfaceAlt,
     },
     cardActions: {
         justifyContent: 'flex-end',
     },
-// ========= ACESSO  ================
-   acesso: {
-    padding: 25,
-    justifyContent: 'center',
-},
-acessoTitulo: {
-    textAlign: 'center',
-    fontWeight: 'bold',  
-    marginBottom: 10,
-},
-acessoTexto: {
-    textAlign: 'center',
-    marginBottom: 30,
-},
-acessoButton: {
-    marginBottom: 15,
-    borderRadius: 5,
-},
-
-// ========= LOGIN   ================
-
-loginContainer: {
-    flex: 1,
-    backgroundColor: '#EEEEEE',
-},
-loginContent: {
-    padding: 25,
-},
-loginTitulo: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginTop: 30,
-},
-loginTexto: {
-    textAlign: 'center',
-    marginTop: 5,
-    marginBottom: 30,
-},
-input: {
-    marginBottom: 15,
-    backgroundColor: '#FFFFFF',
-},
-loginButton: {
-    marginTop: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-},
-// =========================
-// CADASTRO
-// =========================
-
-cadastroContainer: {
-    flex: 1,
-    backgroundColor: '#EEEEEE',
-},
-cadastroContent: {
-    padding: 25,
-},
-cadastroTitulo: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginTop: 20,
-},
-cadastroTexto: {
-    textAlign: 'center',
-    marginTop: 5,
-    marginBottom: 25,
-},
-cadastroButton: {
-    marginTop: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-},
-// ========= CABEÇALHO DO MENU ================
-menuHeader: {
-                padding: 20,
-                backgroundColor: '#C0C0C0',
-            }
-
+    // ── Acesso ──────────────────────────────────
+    acesso: {
+        padding: 25,
+        justifyContent: 'center',
+    },
+    acessoTitulo: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: Colors.textPrimary,
+    },
+    acessoTexto: {
+        textAlign: 'center',
+        marginBottom: 30,
+        color: Colors.textSecondary,
+    },
+    acessoButton: {
+        marginBottom: 15,
+        borderRadius: 8,
+    },
+    // ── Login ───────────────────────────────────
+    loginContainer: {
+        flex: 1,
+        backgroundColor: Colors.background,
+    },
+    loginContent: {
+        padding: 25,
+    },
+    loginTitulo: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        marginTop: 30,
+        color: Colors.textPrimary,
+    },
+    loginTexto: {
+        textAlign: 'center',
+        marginTop: 5,
+        marginBottom: 30,
+        color: Colors.textSecondary,
+    },
+    input: {
+        marginBottom: 15,
+        backgroundColor: Colors.surface,
+    },
+    loginButton: {
+        marginTop: 10,
+        marginBottom: 10,
+        borderRadius: 8,
+    },
+    // ── Cadastro ────────────────────────────────
+    cadastroContainer: {
+        flex: 1,
+        backgroundColor: Colors.background,
+    },
+    cadastroContent: {
+        padding: 25,
+    },
+    cadastroTitulo: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        marginTop: 20,
+        color: Colors.textPrimary,
+    },
+    cadastroTexto: {
+        textAlign: 'center',
+        marginTop: 5,
+        marginBottom: 25,
+        color: Colors.textSecondary,
+    },
+    cadastroButton: {
+        marginTop: 10,
+        marginBottom: 10,
+        borderRadius: 8,
+    },
+    // ── Cabeçalho do Menu (legado) ───────────────
+    menuHeader: {
+        padding: 20,
+        backgroundColor: Colors.primary,
+    },
 });
 
 // ==========================================
-// ESTILOS EXCLUSIVOS DA TELA DE PERFIL
+// ESTILOS DA TELA DE PERFIL
 // ==========================================
 export const perfilStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: Colors.background,
     },
     cabecalho: {
         alignItems: 'center',
         paddingVertical: 30,
-        backgroundColor: '#C0C0C0',
+        backgroundColor: Colors.primary,
     },
     avatarContainer: {
         position: 'relative',
         marginBottom: 10,
     },
     avatar: {
-        backgroundColor: '#F2A900',
+        backgroundColor: Colors.accent,
     },
     avatarImagem: {
         width: 100,
         height: 100,
         borderRadius: 50,
         borderWidth: 3,
-        borderColor: '#FFFFFF',
+        borderColor: Colors.textOnDark,
     },
     botaoEditar: {
         position: 'absolute',
         right: -8,
         bottom: -8,
-        backgroundColor: '#555555',
+        backgroundColor: Colors.accent,
         margin: 0,
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: Colors.textOnDark,
     },
     titulo: {
-        color: '#FFFFFF',
+        color: Colors.textOnDark,
         fontWeight: 'bold',
     },
     subtitulo: {
-        color: '#FFFFFF',
+        color: Colors.drawerSubtext,
         marginTop: 5,
     },
     formulario: {
@@ -207,16 +213,17 @@ export const perfilStyles = StyleSheet.create({
     },
     input: {
         marginBottom: 15,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.surface,
     },
     botao: {
         marginTop: 10,
         paddingVertical: 5,
-        backgroundColor: '#F2A900',
+        backgroundColor: Colors.accent,
     },
     botaoVoltar: {
         marginTop: 15,
         paddingVertical: 5,
+        borderColor: Colors.border,
     },
 });
 
@@ -225,7 +232,7 @@ export const perfilStyles = StyleSheet.create({
 // ==========================================
 export const menuStyles = StyleSheet.create({
     container: {
-        backgroundColor: '#C0C0C0',
+        backgroundColor: Colors.drawerBg,
         paddingTop: 25,
         paddingHorizontal: 20,
         paddingBottom: 10,
@@ -235,37 +242,36 @@ export const menuStyles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        backgroundColor: '#F2A900',
+        backgroundColor: Colors.accent,
     },
     informacoes: {
         flex: 1,
         marginLeft: 15,
     },
     nome: {
-        color: '#FFFFFF',
+        color: Colors.drawerText,
         fontWeight: 'bold',
         fontSize: 19,
     },
     email: {
-        color: '#FFFFFF',
+        color: Colors.drawerSubtext,
         marginTop: 3,
     },
     perfil: {
         marginTop: 15,
         paddingTop: 8,
         borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.3)',
+        borderTopColor: Colors.drawerDivider,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     perfilTexto: {
-        color: '#FFFFFF',
+        color: Colors.drawerText,
         fontWeight: 'bold',
     },
-    // Estilo para o botão de Login quando for visitante
     botaoLoginVisitante: {
         marginTop: 5,
         alignSelf: 'flex-start',
-    }
+    },
 });

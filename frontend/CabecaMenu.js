@@ -29,11 +29,19 @@ const CabecalhoMenu = () => {
       {/* Área do usuário */}
       <View style={styles.usuario}>
         {/* Avatar */}
-        <Avatar.Icon
-          size={65}
-          icon="account"
-          style={styles.avatar}
-        />
+        {usuario && (usuario.foto || usuario.fotoUsuario) ? (
+          <Avatar.Image
+            size={65}
+            source={{ uri: usuario.foto || usuario.fotoUsuario }}
+            style={styles.avatar}
+          />
+        ) : (
+          <Avatar.Icon
+            size={65}
+            icon="account"
+            style={styles.avatar}
+          />
+        )}
 
         {/* Nome e e-mail  Mudança pra quando não tiver um usuário logado. (feature/frontend-menu-identificacao) */}
         <View style={styles.informacoes}>
@@ -81,7 +89,10 @@ const CabecalhoMenu = () => {
 
 
       {/* Área do Notificação */}
-      <Pressable style={styles.perfil} onPress={() => {}}>
+      <Pressable 
+        style={styles.perfil} 
+        onPress={() => navigation.navigate('Notificacoes')}
+      >
         <Text
           variant="bodyMedium"
           style={styles.perfilTexto}>
@@ -91,27 +102,15 @@ const CabecalhoMenu = () => {
           icon="bell"
           iconColor="white"
           size={24}
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Notificacoes')}
         />
       </Pressable>
 
-      {/* Área do Pesquisa */}
-      <Pressable style={styles.perfil} onPress={() => navigation.navigate('Pesquisa')}>
-        <Text
-          variant="bodyMedium"
-          style={styles.perfilTexto}>
-          Pesquisa
-        </Text>
-        <IconButton
-          icon="magnify"
-          iconColor="white"
-          size={24}
-          onPress={() => navigation.navigate('Pesquisa')}
-        />
-      </Pressable>
-
-      {/* Área do configuração */}
-      <Pressable style={styles.perfil} onPress={() => navigation.navigate('Perfil')}>
+      {/* Área de Configuração */}
+      <Pressable 
+        style={styles.perfil} 
+        onPress={() => navigation.navigate('Configuracoes')}
+      >
         <Text
           variant="bodyMedium"
           style={styles.perfilTexto}>
@@ -121,7 +120,7 @@ const CabecalhoMenu = () => {
           icon="cog"
           iconColor="white"
           size={24}
-          onPress={() => navigation.navigate('Perfil')}
+          onPress={() => navigation.navigate('Configuracoes')}
         />
       </Pressable>
 
