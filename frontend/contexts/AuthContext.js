@@ -18,8 +18,13 @@ export const AuthProvider = ({ children }) => {
         setUsuario(null);
     };
 
+    // função para atualizar
+    const atualizarUsuario = (novosDados) => {
+        setUsuario(prev => ({ ...prev, ...novosDados }));
+    };
+
     return (
-        <AuthContext.Provider value={{ usuario, signIn, signOut }}>
+        <AuthContext.Provider value={{ usuario, signIn, signOut, atualizarUsuario }}>
             {children}
         </AuthContext.Provider>
     );

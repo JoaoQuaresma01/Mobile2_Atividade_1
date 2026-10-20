@@ -42,8 +42,7 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
         //REGEX para validar a senha (obriga ter pelo menos 8 caracteres, uma maiúscula, uma minúscula, um número e um caractere especial)
         const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-        if (!regexsenha.test(senhaUsuario))
-        {
+        if (!regexsenha.test(senhaUsuario)) {
             return res.status(400).json({
                 erro: 'Senha inválida. A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.'
             });
@@ -51,7 +50,7 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
 
         // criptografando a senha
         const salt = await bcrypt.genSalt(10);
-        const senhaCriptografada = await bcrypt.hash(senhaUsuario, salt);   
+        const senhaCriptografada = await bcrypt.hash(senhaUsuario, salt);
 
         const novoUsuario = new Usuario({
             nomeUsuario,
@@ -109,9 +108,9 @@ app.get('/', (req, res) => {
 
 app.post('/api/conteudo/cadastrar', async (req, res) => {
     try {
-        const {tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo} = req.body;
+        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo } = req.body;
 
-        const novoConteudo = new Conteudo ({
+        const novoConteudo = new Conteudo({
             tituloConteudo,
             subtituloConteudo,
             urlImagemConteudo,
@@ -119,34 +118,34 @@ app.post('/api/conteudo/cadastrar', async (req, res) => {
             categoriaConteudo,
             dataCriacaoConteudo: Date.now()
         });
-        
-        await novoConteudo.save();    
-        res.status(201).json({mensagem: 'Conteúdo foi cadastrado com su su sucesso'})
-    }catch(error){
-        res.status(500).json({erro: 'Erro ao cadastrar conteúdo', detalhe: error.message})
+
+        await novoConteudo.save();
+        res.status(201).json({ mensagem: 'Conteúdo foi cadastrado com su su sucesso' })
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao cadastrar conteúdo', detalhe: error.message })
     }
 });
 
 app.put('/api/conteudo/:id', async (req, res) => {
     try {
-        const {tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo} = req.body;
-        const novoConteudo = await Conteudo.findByIdAndUpdate(req.params.id, req.body, {new: true});
-        if (!novoConteudo){
-            return res.status(404).json({erro: 'Conteúdo não encontrado'})        
+        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo } = req.body;
+        const novoConteudo = await Conteudo.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!novoConteudo) {
+            return res.status(404).json({ erro: 'Conteúdo não encontrado' })
         }
-        await novoConteudo.save();    
-        res.status(201).json({mensagem: 'Conteúdo foi atualizado com su su sucesso'})
-    }catch(error){
-        res.status(500).json({erro: 'Erro ao atualizar o conteúdo', detalhe: error.message})
+        await novoConteudo.save();
+        res.status(201).json({ mensagem: 'Conteúdo foi atualizado com su su sucesso' })
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar o conteúdo', detalhe: error.message })
     }
 })
 
-app.get('/api/conteudo/listar', async (req, res) =>{
+app.get('/api/conteudo/listar', async (req, res) => {
     try {
         const listaConteudo = await Conteudo.find();
         res.status(200).json(listaConteudo);
     } catch (error) {
-        res.status(500).json({erro: 'Erro ao listar o conteúdo', detalhe: error.message})
+        res.status(500).json({ erro: 'Erro ao listar o conteúdo', detalhe: error.message })
     }
 })
 
@@ -155,18 +154,18 @@ app.get('/api/conteudo/listar', async (req, res) =>{
 //
 app.get('/api/conteudo/buscar', async (req, res) => {
     try {
-        const {termo, categoria} = req.query;
+        const { termo, categoria } = req.query;
         const filtro = {};
         if (termo) {
-            filtro.$or = [{tituloConteudo: {$regex: termo, $options: 'i'}}, {descricaoConteudo: {$regex: termo, $options: 'i'}}];
+            filtro.$or = [{ tituloConteudo: { $regex: termo, $options: 'i' } }, { descricaoConteudo: { $regex: termo, $options: 'i' } }];
         }
-        if (categoria){
-            filtro.categoriaConteudo = {$regex: categoria, $options: 'i'};
+        if (categoria) {
+            filtro.categoriaConteudo = { $regex: categoria, $options: 'i' };
         }
         const resultados = await Conteudo.find(filtro);
-        res.status(200).json(resultados);   
-    }catch (error) {
-        res.status(500).json({erro: 'Erro na busca de conteúdo', detalhe: error.message});
+        res.status(200).json(resultados);
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro na busca de conteúdo', detalhe: error.message });
     }
 });
 
@@ -175,27 +174,106 @@ app.get('/api/conteudo/:id', async (req, res) => {
     try {
         const conteudoId = req.params.id;
         const conteudo = await Conteudo.findById(conteudoId);
-        if (!conteudo){
-            return res.status(404).json({erro: 'Conteúdo não encontrado'})        
+        if (!conteudo) {
+            return res.status(404).json({ erro: 'Conteúdo não encontrado' })
         }
         res.status(200).json(conteudo)
-    }catch(error){
-        res.status(500).json({erro: 'Erro ao buscar conteúdo', detalhe: error.message})
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao buscar conteúdo', detalhe: error.message })
     }
 })
 
 app.delete('/api/conteudo/:id', async (req, res) => {
-    try{
+    try {
         const novoConteudo = await Conteudo.findByIdAndDelete(req.params.id);
-        if (!novoConteudo){
-            return res.status(404).json({erro: "Conteúdo não encontrado."})
+        if (!novoConteudo) {
+            return res.status(404).json({ erro: "Conteúdo não encontrado." })
         }
-        res.status(201).json({mensagem: "Conteúdo deletado com su su sucesso!"});
+        res.status(201).json({ mensagem: "Conteúdo deletado com su su sucesso!" });
 
-    }catch(error){
-        res.status(500).json({erro: "Erro ao deletar conteúdo", detalhe: error.message})
+    } catch (error) {
+        res.status(500).json({ erro: "Erro ao deletar conteúdo", detalhe: error.message })
     }
 })
+
+//
+// Novas Rotas para a tela de configurações 
+//
+
+// ROTA: Excluir Conta do Usuário
+app.delete('/api/usuarios/excluir/:email', async (req, res) => {
+    try {
+        const emailFormatado = req.params.email.toLowerCase().trim();
+        const usuarioDeletado = await Usuario.findOneAndDelete({ emailUsuario: emailFormatado });
+
+        if (!usuarioDeletado) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        res.status(200).json({ mensagem: 'Conta excluída com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao excluir conta.', detalhe: error.message });
+    }
+});
+// ROTA: Alterar Senha do Usuário
+app.put('/api/usuarios/alterar-senha', async (req, res) => {
+    try {
+        const { emailUsuario, senhaAtual, novaSenha } = req.body;
+        const emailFormatado = emailUsuario.toLowerCase().trim();
+        const usuario = await Usuario.findOne({ emailUsuario: emailFormatado });
+        if (!usuario) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+        // Valida se a senha atual está correta
+        const senhaCorreta = await bcrypt.compare(senhaAtual, usuario.senhaUsuario);
+        if (!senhaCorreta) {
+            return res.status(400).json({ erro: 'A senha atual está incorreta.' });
+        }
+        // Valida o formato da nova senha (8 caracteres, maiúscula, número, especial)
+        const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!regexsenha.test(novaSenha)) {
+            return res.status(400).json({
+                erro: 'Nova senha fraca. Deve conter 8 caracteres, maiúscula, minúscula, número e caractere especial.'
+            });
+        }
+        // Criptografa a nova senha e salva
+        const salt = await bcrypt.genSalt(10);
+        usuario.senhaUsuario = await bcrypt.hash(novaSenha, salt);
+        await usuario.save();
+        res.status(200).json({ mensagem: 'Senha alterada com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao alterar senha.', detalhe: error.message });
+    }
+});
+
+app.put('/api/usuarios/perfil', async (req, res) => {
+    try {
+        const { emailUsuario, nomeUsuario, fotoUsuario } = req.body;
+        const emailFormatado = emailUsuario.toLowerCase().trim();
+
+        // Procura pelo e-mail e atualiza nome e foto
+        const usuarioAtualizado = await Usuario.findOneAndUpdate(
+            { emailUsuario: emailFormatado },
+            { nomeUsuario, fotoUsuario: fotoUsuario || '' },
+            { new: true } // Retorna os dados já atualizados
+        );
+
+        if (!usuarioAtualizado) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
+
+        res.status(200).json({
+            mensagem: 'Perfil atualizado com sucesso!',
+            usuario: {
+                nome: usuarioAtualizado.nomeUsuario,
+                email: usuarioAtualizado.emailUsuario,
+                foto: usuarioAtualizado.fotoUsuario
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao atualizar perfil.', detalhe: error.message });
+    }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
