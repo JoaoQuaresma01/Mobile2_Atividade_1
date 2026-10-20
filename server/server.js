@@ -71,7 +71,7 @@ app.post('/api/usuarios/cadastro', async (req, res) => {
 app.post('/api/usuarios/login', async (req, res) => {
     try {
         const { emailUsuario, senhaUsuario } = req.body;
-        const emailFormatado = emailUsuario.toLowerCase();
+        const emailFormatado = emailUsuario.trim().toLowerCase();
 
         // buscando usuário pelo email
         const usuario = await Usuario.findOne({ emailUsuario: emailFormatado });
@@ -247,13 +247,26 @@ app.put('/api/usuarios/alterar-senha', async (req, res) => {
 
 app.put('/api/usuarios/perfil', async (req, res) => {
     try {
-        const { emailUsuario, nomeUsuario, fotoUsuario } = req.body;
+        const { emailUsuario, nomeUsuario, fotoUsuario, novaSenha } = req.body;
         const emailFormatado = emailUsuario.toLowerCase().trim();
 
-        // Procura pelo e-mail e atualiza nome e foto
+        const camposAtualizar = { nomeUsuario, fotoUsuario: fotoUsuario || '' };
+
+        if (novaSenha && novaSenha.trim()) {
+            const regexsenha = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!regexsenha.test(novaSenha)) {
+                return res.status(400).json({
+                    erro: 'Nova senha fraca. Deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.'
+                });
+            }
+            const salt = await bcrypt.genSalt(10);
+            camposAtualizar.senhaUsuario = await bcrypt.hash(novaSenha, salt);
+        }
+
+        // Procura pelo e-mail e atualiza os dados
         const usuarioAtualizado = await Usuario.findOneAndUpdate(
             { emailUsuario: emailFormatado },
-            { nomeUsuario, fotoUsuario: fotoUsuario || '' },
+            camposAtualizar,
             { new: true } // Retorna os dados já atualizados
         );
 

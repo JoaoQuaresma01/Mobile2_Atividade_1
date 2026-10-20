@@ -81,7 +81,7 @@ const CabecalhoMenu = () => {
 
 
       {/* Área do Notificação */}
-      <View style={styles.perfil}>
+      <Pressable style={styles.perfil} onPress={() => {}}>
         <Text
           variant="bodyMedium"
           style={styles.perfilTexto}>
@@ -91,12 +91,12 @@ const CabecalhoMenu = () => {
           icon="bell"
           iconColor="white"
           size={24}
-          onPress={{}}
+          onPress={() => {}}
         />
-      </View>
+      </Pressable>
 
       {/* Área do Pesquisa */}
-      <View style={styles.perfil}>
+      <Pressable style={styles.perfil} onPress={() => navigation.navigate('Pesquisa')}>
         <Text
           variant="bodyMedium"
           style={styles.perfilTexto}>
@@ -106,12 +106,12 @@ const CabecalhoMenu = () => {
           icon="magnify"
           iconColor="white"
           size={24}
-          onPress={() => navigation.navigate('Perfil')}
+          onPress={() => navigation.navigate('Pesquisa')}
         />
-      </View>
-      {/* Área do configuração */}
-      <View style={styles.perfil}  >
+      </Pressable>
 
+      {/* Área do configuração */}
+      <Pressable style={styles.perfil} onPress={() => navigation.navigate('Perfil')}>
         <Text
           variant="bodyMedium"
           style={styles.perfilTexto}>
@@ -123,7 +123,7 @@ const CabecalhoMenu = () => {
           size={24}
           onPress={() => navigation.navigate('Perfil')}
         />
-      </View>
+      </Pressable>
 
       {/* Área do sair */}
       <View style={styles.perfil}>

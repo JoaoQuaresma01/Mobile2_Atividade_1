@@ -67,6 +67,16 @@ export const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         elevation: 4,
     },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    cardCover: {
+        height: 200,
+    },
+    cardActions: {
+        justifyContent: 'flex-end',
+    },
 // ========= ACESSO  ================
    acesso: {
     padding: 25,

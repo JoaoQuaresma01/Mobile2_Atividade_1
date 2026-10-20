@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text, ScrollView, Alert } from 'react-native';
 import { Appbar, ActivityIndicator } from 'react-native-paper';
 import { styles } from './css/Styles';
 import ModCard from './Cards';
 import api from './services/api'; // seu axios configurado
 import { useFocusEffect } from '@react-navigation/native';
+import { AuthContext } from './contexts/AuthContext';
 
 const AppBar = ({ navigation }) => {
+    const { usuario } = useContext(AuthContext);
     const [listaConteudos, setListaConteudos] = useState([]);
     const [carregando, setCarregando] = useState(true);
 
@@ -64,13 +66,14 @@ const AppBar = ({ navigation }) => {
     return (
         <>
             <Appbar.Header style={styles.header}>
-                {!usuario && (
-                    <Appbar.Action icon="account" onPress={() => navigation.navigate('Acesso')} />
-                )}
                 <Appbar.Action icon="menu" iconColor="white" onPress={() => navigation.openDrawer()} />
                 <Appbar.Content title="Technologic" style={styles.title} />
                 <Appbar.Action icon="magnify" onPress={() => navigation.navigate('Pesquisa')} />
-                <Appbar.Action icon="account" onPress={() => navigation.navigate('Acesso')} />
+                {!usuario ? (
+                    <Appbar.Action icon="account" onPress={() => navigation.navigate('Acesso')} />
+                ) : (
+                    <Appbar.Action icon="account-circle" onPress={() => navigation.navigate('Perfil')} />
+                )}
             </Appbar.Header>
 
             {/* Abas */}

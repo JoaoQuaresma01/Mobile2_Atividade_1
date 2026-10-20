@@ -56,13 +56,18 @@ const Perfil = ({ navigation }) => {
             return;
         }
         try {
-            const response = await api.put('/usuarios/perfil', {
+            const payload = {
                 emailUsuario: email,
                 nomeUsuario: nome,
                 fotoUsuario: imagem || '',
-            });
+            };
+            if (senha.trim()) {
+                payload.novaSenha = senha;
+            }
+            const response = await api.put('/usuarios/perfil', payload);
             // Atualiza a memória global para que o menu lateral mostre o novo nome/foto na hora
             atualizarUsuario(response.data.usuario);
+            setSenha('');
             Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
         } catch (error) {
             Alert.alert('Erro', error.response?.data?.erro || 'Erro ao conectar com o servidor.');
