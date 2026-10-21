@@ -208,13 +208,21 @@ app.get('/api/conteudo/buscar', async (req, res) => {
     try {
         const { termo, categoria } = req.query;
         const filtro = {};
-        if (termo) {
-            filtro.$or = [{ tituloConteudo: { $regex: termo, $options: 'i' } }, { descricaoConteudo: { $regex: termo, $options: 'i' } }];
+        const escaparRegex = (valor) => String(valor).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        if (termo && String(termo).trim()) {
+            const padrao = escaparRegex(String(termo).trim());
+            filtro.$or = [
+                { tituloConteudo: { $regex: padrao, $options: 'i' } },
+                { subtituloConteudo: { $regex: padrao, $options: 'i' } },
+                { descricaoConteudo: { $regex: padrao, $options: 'i' } },
+                { categoriaConteudo: { $regex: padrao, $options: 'i' } },
+            ];
         }
         if (categoria) {
-            filtro.categoriaConteudo = { $regex: categoria, $options: 'i' };
+            filtro.categoriaConteudo = { $regex: escaparRegex(categoria), $options: 'i' };
         }
-        const resultados = await Conteudo.find(filtro);
+        const resultados = await Conteudo.find(filtro).sort({ dataCriacaoConteudo: -1 });
         res.status(200).json(resultados);
     } catch (error) {
         res.status(500).json({ erro: 'Erro na busca de conteúdo', detalhe: error.message });
