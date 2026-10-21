@@ -141,8 +141,7 @@ Navegação: Drawer (**Início**, **Séries**) envolvendo um Stack com as demais
 - `senhaUsuario` (hash bcrypt)
 - `notificacaoUsuario`
 - `fotoUsuario`
-- `telefone`
-- `cpf`
+
 
 Senha no cadastro e na troca: mínimo 8 caracteres, com maiúscula, minúscula, número e caractere especial.
 
