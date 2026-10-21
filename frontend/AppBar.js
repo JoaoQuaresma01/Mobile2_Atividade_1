@@ -24,17 +24,32 @@ const AppBar = ({ navigation }) => {
     const [carregando, setCarregando] = useState(true);
     const [abaSelecionada, setAbaSelecionada] = useState('todos');
 
+    const emailLogado = (usuario?.email || usuario?.emailUsuario || '').trim().toLowerCase();
+    const idLogado = String(usuario?.id || usuario?._id || '');
+
     const carregarConteudos = useCallback(async () => {
         try {
             setCarregando(true);
-            const response = await api.get('/conteudo/listar');
-            setListaConteudos(response.data);
+            if (abaSelecionada === 'meus') {
+                if (!emailLogado && !idLogado) {
+                    setListaConteudos([]);
+                    return;
+                }
+                const response = await api.get('/conteudo/meus', {
+                    params: { emailUsuario: emailLogado, idUsuario: idLogado },
+                });
+                setListaConteudos(Array.isArray(response.data) ? response.data : []);
+            } else {
+                const response = await api.get('/conteudo/listar');
+                setListaConteudos(Array.isArray(response.data) ? response.data : []);
+            }
         } catch (error) {
             console.error('Erro ao buscar conteúdos:', error);
+            setListaConteudos([]);
         } finally {
             setCarregando(false);
         }
-    }, []);
+    }, [abaSelecionada, emailLogado, idLogado]);
 
     useFocusEffect(
         useCallback(() => {
@@ -53,10 +68,13 @@ const AppBar = ({ navigation }) => {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            await api.delete(`/conteudo/${id}`);
+                            await api.delete(`/conteudo/${id}`, {
+                                data: { emailUsuario: emailLogado },
+                            });
                             setListaConteudos(prev => prev.filter(item => item._id !== id));
                         } catch (err) {
-                            Alert.alert('Erro', 'Não foi possível excluir o conteúdo.');
+                            const mensagemErro = err.response?.data?.erro || 'Não foi possível excluir o conteúdo.';
+                            Alert.alert('Erro', mensagemErro);
                         }
                     },
                 },
@@ -64,14 +82,15 @@ const AppBar = ({ navigation }) => {
         );
     };
 
-    const listaFiltrada = abaSelecionada === 'todos' ? listaConteudos : [];
-    const mostrarMeusVazio = abaSelecionada === 'meus' && !carregando;
+    const listaFiltrada = listaConteudos;
+    const mostrarMeusVazio = abaSelecionada === 'meus' && !carregando && listaFiltrada.length === 0;
 
     const renderItem = ({ item }) => (
         <ModCard
             conteudo={item}
             onExcluir={handleExcluir}
             onEditar={(c) => navigation.navigate('EditarConteudo', { conteudo: c })}
+            onVer={(c) => navigation.navigate('VerCard', { conteudo: c })}
         />
     );
 
@@ -89,7 +108,7 @@ const AppBar = ({ navigation }) => {
                     mode="contained"
                     icon="plus"
                     style={abStyles.emptyBotao}
-                    onPress={() => navigation.navigate('EditarConteudo', { conteudo: null })}
+                    onPress={() => navigation.navigate('CriarCard')}
                 >
                     Cadastrar conteúdo
                 </Button>
@@ -130,7 +149,7 @@ const AppBar = ({ navigation }) => {
                         mode="contained"
                         icon="plus"
                         style={abStyles.emptyBotao}
-                        onPress={() => navigation.navigate('EditarConteudo', { conteudo: null })}
+                        onPress={() => navigation.navigate('CriarCard')}
                     >
                         Cadastrar conteúdo
                     </Button>

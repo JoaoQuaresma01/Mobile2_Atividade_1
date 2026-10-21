@@ -66,6 +66,24 @@ const CabecalhoMenu = () => {
       </View>
 
 
+      {usuario && (
+        <Pressable
+          style={styles.perfil}
+          onPress={() => {
+            navigation.navigate('Início', { screen: 'CriarCard' });
+          }}
+        >
+          <Text variant="bodyMedium" style={styles.perfilTexto}>
+            Criar card
+          </Text>
+          <IconButton
+            icon="card-plus-outline"
+            iconColor="white"
+            size={24}
+          />
+        </Pressable>
+      )}
+
       {/* Área do perfil */}
       <Pressable
         style={styles.perfil}

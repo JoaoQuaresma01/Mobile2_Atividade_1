@@ -6,6 +6,8 @@ const conteudoSchema = new mongoose.Schema ({
     urlImagemConteudo: {type: String, required: true},
     descricaoConteudo: {type: String},
     categoriaConteudo: {type: String},
+    emailUsuarioConteudo: { type: String, required: true, lowercase: true, trim: true },
+    idUsuarioConteudo: { type: String, default: '' },
     dataCriacaoConteudo: {type: Date, default: Date.now}
 })
 
