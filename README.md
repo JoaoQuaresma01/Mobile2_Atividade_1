@@ -6,7 +6,7 @@ Visitantes podem ver o catálogo. Usuários logados criam cards, gerenciam o pr�
 
 ## Autores
 
-- **Ana Laura Mrtins Souto**
+- **Ana Laura Martins Souto**
 - **João Victor Quaresma de Arruda**
 
 ## Tecnologias
