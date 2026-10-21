@@ -6,6 +6,7 @@ Visitantes podem ver o catálogo. Usuários logados criam cards, gerenciam o pr�
 
 ## Autores
 
+- 5° Semestre DSM - FATEC Votorantim - 2026
 - **Ana Laura Martins Souto**
 - **João Victor Quaresma de Arruda**
 
