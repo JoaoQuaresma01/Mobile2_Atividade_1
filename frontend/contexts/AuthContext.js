@@ -10,7 +10,13 @@ export const AuthProvider = ({ children }) => {
 
     // função que chamaremos na tela de Login quando der sucesso
     const signIn = (dadosUsuario) => {
-        setUsuario(dadosUsuario);
+        const email = String(dadosUsuario?.email || dadosUsuario?.emailUsuario || '').trim().toLowerCase();
+        setUsuario({
+            ...dadosUsuario,
+            id: dadosUsuario?.id || dadosUsuario?._id || '',
+            email,
+            emailUsuario: email,
+        });
     };
 
     // função do botão de "sair"

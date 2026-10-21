@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Alert, StyleSheet } from 'react-native';
 import { Appbar, TextInput, Button, Text } from 'react-native-paper';
 import { styles } from './css/Styles';
 import api from './services/api';
+import { AuthContext } from './contexts/AuthContext';
 
 const EditarConteudo = ({ route, navigation }) => {
+    const { usuario } = useContext(AuthContext);
     const { conteudo } = route.params || {};
     const isNovo = !conteudo?._id;
+    const emailLogado = (usuario?.email || usuario?.emailUsuario || '').trim().toLowerCase();
+    const emailAutor = (conteudo?.emailUsuarioConteudo || '').trim().toLowerCase();
 
     const [titulo, setTitulo]       = useState(conteudo?.tituloConteudo    || '');
     const [subtitulo, setSubtitulo] = useState(conteudo?.subtituloConteudo || '');
@@ -14,6 +18,18 @@ const EditarConteudo = ({ route, navigation }) => {
     const [descricao, setDescricao] = useState(conteudo?.descricaoConteudo || '');
     const [categoria, setCategoria] = useState(conteudo?.categoriaConteudo || '');
     const [salvando, setSalvando]   = useState(false);
+
+    useEffect(() => {
+        if (!usuario) {
+            Alert.alert('Atenção', 'Faça login para continuar.');
+            navigation.replace('Login');
+            return;
+        }
+        if (!isNovo && emailAutor && emailLogado !== emailAutor) {
+            Alert.alert('Atenção', 'Você só pode editar os próprios cards.');
+            navigation.goBack();
+        }
+    }, [usuario, isNovo, emailAutor, emailLogado, navigation]);
 
     const salvar = async () => {
         if (!titulo.trim()) {
@@ -33,25 +49,25 @@ const EditarConteudo = ({ route, navigation }) => {
             setSalvando(true);
 
             if (isNovo) {
-                // Cadastrar novo conteúdo
                 await api.post('/conteudo/cadastrar', {
                     tituloConteudo:    titulo.trim(),
                     subtituloConteudo: subtitulo.trim(),
                     urlImagemConteudo: urlImagem.trim(),
                     descricaoConteudo: descricao.trim(),
                     categoriaConteudo: categoria.trim(),
+                    emailUsuario: emailLogado,
                 });
                 Alert.alert('Sucesso!', 'Conteúdo cadastrado com sucesso!', [
                     { text: 'OK', onPress: () => navigation.goBack() },
                 ]);
             } else {
-                // Atualizar conteúdo existente
                 await api.put(`/conteudo/${conteudo._id}`, {
                     tituloConteudo:    titulo.trim(),
                     subtituloConteudo: subtitulo.trim(),
                     urlImagemConteudo: urlImagem.trim(),
                     descricaoConteudo: descricao.trim(),
                     categoriaConteudo: categoria.trim(),
+                    emailUsuario: emailLogado,
                 });
                 Alert.alert('Sucesso!', 'Conteúdo atualizado com sucesso!', [
                     { text: 'OK', onPress: () => navigation.goBack() },
@@ -59,7 +75,8 @@ const EditarConteudo = ({ route, navigation }) => {
             }
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            Alert.alert('Erro', 'Não foi possível salvar o conteúdo.');
+            const mensagemErro = error.response?.data?.erro || 'Não foi possível salvar o conteúdo.';
+            Alert.alert('Erro', mensagemErro);
         } finally {
             setSalvando(false);
         }

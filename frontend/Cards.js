@@ -4,13 +4,21 @@ import { useContext } from 'react';
 import { AuthContext } from './contexts/AuthContext';
 import Colors from './theme/Colors';
 
-const ModCard = ({ conteudo, onExcluir, onEditar }) => {
+const ModCard = ({ conteudo, onExcluir, onEditar, onVer }) => {
     const { usuario } = useContext(AuthContext);
 
     const titulo    = conteudo?.tituloConteudo    || 'Sem título';
     const subtitulo = conteudo?.subtituloConteudo || '';
     const urlImagem = conteudo?.urlImagemConteudo || 'https://picsum.photos/seed/tech/640/360';
     const descricao = conteudo?.descricaoConteudo || '';
+    const emailLogado = (usuario?.email || usuario?.emailUsuario || '').trim().toLowerCase();
+    const idLogado = String(usuario?.id || usuario?._id || '');
+    const emailAutor = (conteudo?.emailUsuarioConteudo || '').trim().toLowerCase();
+    const idAutor = String(conteudo?.idUsuarioConteudo || '');
+    const ehDono = Boolean(
+        (emailLogado && emailAutor && emailLogado === emailAutor) ||
+        (idLogado && idAutor && idLogado === idAutor)
+    );
 
     return (
         <Card style={cardStyles.card}>
@@ -38,29 +46,39 @@ const ModCard = ({ conteudo, onExcluir, onEditar }) => {
                 )}
             </View>
 
-            {/* AÇÕES — visíveis só para usuário logado */}
-            {usuario && (
-                <View style={cardStyles.acoes}>
-                    <Button
-                        compact
-                        icon="pencil"
-                        mode="text"
-                        textColor={Colors.accent}
-                        onPress={() => onEditar && onEditar(conteudo)}
-                    >
-                        Editar
-                    </Button>
-                    <Button
-                        compact
-                        icon="delete"
-                        mode="text"
-                        textColor={Colors.danger}
-                        onPress={() => onExcluir && onExcluir(conteudo?._id)}
-                    >
-                        Excluir
-                    </Button>
-                </View>
-            )}
+            <View style={cardStyles.acoes}>
+                <Button
+                    compact
+                    icon="eye"
+                    mode="text"
+                    textColor={Colors.accent}
+                    onPress={() => onVer && onVer(conteudo)}
+                >
+                    Ver
+                </Button>
+                {ehDono && (
+                    <>
+                        <Button
+                            compact
+                            icon="pencil"
+                            mode="text"
+                            textColor={Colors.accent}
+                            onPress={() => onEditar && onEditar(conteudo)}
+                        >
+                            Editar
+                        </Button>
+                        <Button
+                            compact
+                            icon="delete"
+                            mode="text"
+                            textColor={Colors.danger}
+                            onPress={() => onExcluir && onExcluir(conteudo?._id)}
+                        >
+                            Excluir
+                        </Button>
+                    </>
+                )}
+            </View>
         </Card>
     );
 };

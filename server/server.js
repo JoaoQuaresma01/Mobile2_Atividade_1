@@ -88,6 +88,7 @@ app.post('/api/usuarios/login', async (req, res) => {
         res.status(200).json({
             mensagem: 'Login realizado com sucesso!',
             usuario: {
+                id: String(usuario._id),
                 nome: usuario.nomeUsuario,
                 email: usuario.emailUsuario,
                 foto: usuario.fotoUsuario,
@@ -111,7 +112,17 @@ app.get('/', (req, res) => {
 
 app.post('/api/conteudo/cadastrar', async (req, res) => {
     try {
-        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo } = req.body;
+        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, emailUsuario, emailUsuarioConteudo, email } = req.body;
+        const emailFormatado = (emailUsuario || emailUsuarioConteudo || email || '').trim().toLowerCase();
+
+        if (!emailFormatado) {
+            return res.status(401).json({ erro: 'É necessário estar logado para cadastrar conteúdo.' });
+        }
+
+        const autor = await Usuario.findOne({ emailUsuario: emailFormatado });
+        if (!autor) {
+            return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        }
 
         const novoConteudo = new Conteudo({
             tituloConteudo,
@@ -119,11 +130,13 @@ app.post('/api/conteudo/cadastrar', async (req, res) => {
             urlImagemConteudo,
             descricaoConteudo,
             categoriaConteudo,
+            emailUsuarioConteudo: autor.emailUsuario,
+            idUsuarioConteudo: String(autor._id),
             dataCriacaoConteudo: Date.now()
         });
 
         await novoConteudo.save();
-        res.status(201).json({ mensagem: 'Conteúdo foi cadastrado com su su sucesso' })
+        res.status(201).json({ mensagem: 'Conteúdo foi cadastrado com su su sucesso', conteudo: novoConteudo })
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao cadastrar conteúdo', detalhe: error.message })
     }
@@ -131,13 +144,29 @@ app.post('/api/conteudo/cadastrar', async (req, res) => {
 
 app.put('/api/conteudo/:id', async (req, res) => {
     try {
-        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, dataCriacaoConteudo } = req.body;
-        const novoConteudo = await Conteudo.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!novoConteudo) {
+        const { tituloConteudo, subtituloConteudo, urlImagemConteudo, descricaoConteudo, categoriaConteudo, emailUsuario } = req.body;
+        const emailFormatado = (emailUsuario || '').trim().toLowerCase();
+
+        if (!emailFormatado) {
+            return res.status(401).json({ erro: 'É necessário estar logado para editar conteúdo.' });
+        }
+
+        const conteudo = await Conteudo.findById(req.params.id);
+        if (!conteudo) {
             return res.status(404).json({ erro: 'Conteúdo não encontrado' })
         }
-        await novoConteudo.save();
-        res.status(201).json({ mensagem: 'Conteúdo foi atualizado com su su sucesso' })
+
+        if (conteudo.emailUsuarioConteudo !== emailFormatado) {
+            return res.status(403).json({ erro: 'Você só pode editar os próprios cards.' });
+        }
+
+        conteudo.tituloConteudo = tituloConteudo;
+        conteudo.subtituloConteudo = subtituloConteudo;
+        conteudo.urlImagemConteudo = urlImagemConteudo;
+        conteudo.descricaoConteudo = descricaoConteudo;
+        conteudo.categoriaConteudo = categoriaConteudo;
+        await conteudo.save();
+        res.status(200).json({ mensagem: 'Conteúdo foi atualizado com su su sucesso' })
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao atualizar o conteúdo', detalhe: error.message })
     }
@@ -145,12 +174,32 @@ app.put('/api/conteudo/:id', async (req, res) => {
 
 app.get('/api/conteudo/listar', async (req, res) => {
     try {
-        const listaConteudo = await Conteudo.find();
+        const listaConteudo = await Conteudo.find().sort({ dataCriacaoConteudo: -1 });
         res.status(200).json(listaConteudo);
     } catch (error) {
         res.status(500).json({ erro: 'Erro ao listar o conteúdo', detalhe: error.message })
     }
 })
+
+app.get('/api/conteudo/meus', async (req, res) => {
+    try {
+        const emailFormatado = (req.query.emailUsuario || '').trim().toLowerCase();
+        const idUsuario = String(req.query.idUsuario || '').trim();
+
+        if (!emailFormatado && !idUsuario) {
+            return res.status(401).json({ erro: 'É necessário estar logado para ver seus conteúdos.' });
+        }
+
+        const filtro = { $or: [] };
+        if (emailFormatado) filtro.$or.push({ emailUsuarioConteudo: emailFormatado });
+        if (idUsuario) filtro.$or.push({ idUsuarioConteudo: idUsuario });
+
+        const listaConteudo = await Conteudo.find(filtro).sort({ dataCriacaoConteudo: -1 });
+        res.status(200).json(listaConteudo);
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao listar seus conteúdos', detalhe: error.message });
+    }
+});
 
 //
 // Rota para buscas (Barra de pesquisa e filtro)
@@ -188,11 +237,23 @@ app.get('/api/conteudo/:id', async (req, res) => {
 
 app.delete('/api/conteudo/:id', async (req, res) => {
     try {
-        const novoConteudo = await Conteudo.findByIdAndDelete(req.params.id);
-        if (!novoConteudo) {
+        const emailFormatado = (req.body?.emailUsuario || req.query?.emailUsuario || '').trim().toLowerCase();
+
+        if (!emailFormatado) {
+            return res.status(401).json({ erro: 'É necessário estar logado para excluir conteúdo.' });
+        }
+
+        const conteudo = await Conteudo.findById(req.params.id);
+        if (!conteudo) {
             return res.status(404).json({ erro: "Conteúdo não encontrado." })
         }
-        res.status(201).json({ mensagem: "Conteúdo deletado com su su sucesso!" });
+
+        if (conteudo.emailUsuarioConteudo !== emailFormatado) {
+            return res.status(403).json({ erro: 'Você só pode excluir os próprios cards.' });
+        }
+
+        await Conteudo.findByIdAndDelete(req.params.id);
+        res.status(200).json({ mensagem: "Conteúdo deletado com su su sucesso!" });
 
     } catch (error) {
         res.status(500).json({ erro: "Erro ao deletar conteúdo", detalhe: error.message })
@@ -285,6 +346,7 @@ app.put('/api/usuarios/perfil', async (req, res) => {
         res.status(200).json({
             mensagem: 'Perfil atualizado com sucesso!',
             usuario: {
+                id: String(usuarioAtualizado._id),
                 nome: usuarioAtualizado.nomeUsuario,
                 email: usuarioAtualizado.emailUsuario,
                 foto: usuarioAtualizado.fotoUsuario,
